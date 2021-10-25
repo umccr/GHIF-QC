@@ -24,8 +24,11 @@ In terms of scope, the workgroup has agreed to focus on germline WGS QC first. W
 
 ### Documents
 [GHIF repo](https://github.com/c-BIG/wgs-sample-qc)
+
 [GHIF WGS QC Meeting minutes](https://docs.google.com/document/d/1gjJ_C2OK8aTEbAOBpWn9ygk9VRUPTP0AICa86DBqOOo/edit#heading=h.3r5642cb8rj)
+
 [GHIF WGS QC Metric definitions](https://docs.google.com/document/d/17bVufpacyoUM4UDKlwkr-0KOG-yZrcVSvM6yC9gbrk4/edit)
+
 [GHIF example implementations - as of 25/10/21 branch ahead of main](https://github.com/c-BIG/wgs-sample-qc/tree/example_implementation_sg/example_implementations/sg-npm)
 
 ### Data File locations
@@ -41,6 +44,7 @@ aws s3 ls s3://1000genomes-dragen-3.7.6/references/fasta/hg38.fa
 ```
 NIST Genome Stratifications -  GRCh38_notinalllowmapandsegdupregions.bed.gz (The complement of the union of all difficult to map regions and all segmental duplications) used to limit estimates to higher confidence regions
 (https://data.nist.gov/od/id/mds2-2190)
+
 *Need to check if this really is limited to autosomes! - It does not appear to be so everything should be redone with an autosome only co-ordinates bed*
 
 
@@ -53,16 +57,24 @@ File locations on Gadi:
 ### Metric definitions
 General template
 **Id** (mandatory): metric_id
+
 **Description** (mandatory): Metric description.
+
 **Source** (mandatory): Tool and version used to calculate the metric.
+
 **Implementation details** (optional, depending on metric): Standardised insights into the metric implementation, where possible.
+
 
 #### Yield
 *(Desired example implementation was for Base quality ≥ Q30, still not sure how to do this)*
 **Id:** yield_mapped_bases
+
 **Description:** The number of mapped bases - filtered by the CIGAR string corresponding to the read they belong to. Only alignment matches(M), inserts(I), sequence matches(=) and sequence mismatches(X) are counted.
+
 **Source:** samtools v1.13
+
 **Implementation details:**
+
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 *(The reference fasta file is only required for GC-depth and mismatches-per-cycle calculation - so not really required here)*
 To obtain Summary Numbers only
@@ -97,12 +109,17 @@ bases mapped (cigar) - number of mapped bases filtered by the CIGAR string corre
 
 #### Average coverage (example implementation: Mean autosome coverage)
 **Id:** mean_autosome_coverage
+
 **Description:** The mean coverage in autosomes.
+
 **Source:** samtools v1.13
+
 **Implementation details:**
 
 `samtools coverage --min-BQ 20 --min-MQ 1 --excl-flags DUP --output samtoolscov_all.txt NA12878.bam`
+
 The tabulated output contains mean depth of coverage per chromosome ("meandepth" - column 7) which can be averaged for the 22 autosomes (ignoring chromosome length)
+
 `cat samtoolscov_all.txt | awk 'NR==2,NR==23' | awk '{sum += $7} END {print sum / 22}' `
 >29.998
 
@@ -127,9 +144,13 @@ cat samtoolscov_all.txt | awk 'NR==2,NR==23' | awk '{sum7 += $7*$3; sum3 += $3} 
 
 *An Alternative may be to try and use mosdepth for estimates as it is faster than samtools, however mosdepth does not appear to be able to exclude bases because of low base-quality*
 **Id:** mean_autosome_coverage
+
 **Description:** The mean coverage in autosomes.
+
 **Source:** mosdepth v0.3.2
+
 **Implementation details:**
+
 `mosdepth --no-per-base --by 1000 --mapq 1 NA12878_all NA12878.bam`
 NA12878_all.mosdepth.summary.txt contains a summary of mean depths per chromosome and within specified regions per chromosome.
 Mean for all autosomes can be calculated in a similar fashion to samtools mean_autosome_coverage
@@ -156,10 +177,15 @@ Other options
 
 
 ##### Average coverage excluding low mapping regions
+ 
 **Id:** mean_high_confidence_region_coverage
+ 
 **Description:** The mean coverage in all autosomes excluding all difficult to map regions and all segmental duplications.
+ 
 **Source:** mosdepth v0.3.2
+ 
 **Implementation details:**
+ 
 `mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1 NA12878_nialmsdr NA12878.bam`
 *Investigate using [datamash](https://www.gnu.org/software/datamash/) for extracting metrics from NA12878_nialmsdr.mosdepth.summary.txt*
 *Manual calculation for mean_autosome_coverage from mosdepth summary file = 31.63*
@@ -168,9 +194,13 @@ Other options
 
 #### Genome completeness (example implementation: Percent autosomes covered ≥ 15 X)
 **Id:** pct_high_confidence_regions_20x
+ 
 **Description:** The percentage of bases that attained at least 20X sequence coverage in all autosomes excluding all difficult to map regions and all segmental duplications.
+ 
 **Source:** mosdepth v0.3.2
+ 
 **Implementation details:
+ 
 ```
 #Run mosdepth - as used for mean_high_confidence_region_coverage
 mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1 NA12878_nialmsdr NA12878.bam`
@@ -182,18 +212,24 @@ grep -h "\btotal	20\b" NA12878_nialmsdr.mosdepth.region.dist.txt | cut -f3
 98 %
 
 From [Mosdepth readme](https://github.com/brentp/mosdepth)
+ 
 >The $prefix.mosdepth.global.dist.txt file contains, a cumulative distribution indicating the proportion of total bases (or the proportion of the --by for $prefix.mosdepth.region.dist.txt) that were covered for at least a given coverage value. It does this for each chromosome, and for the whole genome.
 
 So the global percent covered >= 20X is also available
+ 
 `grep -h "\btotal	20\b" NA12878_nialmsdr.mosdepth.global.dist.txt | cut -f3`
 >0.89
 
 
 #### Genome coverage uniformity
 **Id:** high_confidence_regions_coverage_uniformity
+ 
 **Description:** The percentage of bases with more or less than 25% coverage difference from the mean autosome coverage
+ 
 **Source:** in-house tool based on mosdepth v0.3.2 calculating (PCT < 0.75 * mean_autosome_coverage) + (PCT > 1.25 * mean_autosome_coverage)
+ 
 **Implementation details:** same as mean_autosome_coverage.
+ 
 ```
 #Run mosdepth - as used for high_confidence_region_coverage
 mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1 NA12878_nialmsdr NA12878.bam`
@@ -214,8 +250,11 @@ grep -h "\btotal	40\b" NA12878_nialmsdr.mosdepth.region.dist.txt | cut -f3
 
 #### Contamination estimate
 **Id:** read_mapping_quality
+ 
 **Description:** The percentage of reads mappable to the REF sequence with MAPQ>0
+ 
 **Source:** samtools v1.13 (reads_mapped_percent)
+ 
 **Implementation details
 
 As used for average coverage
@@ -251,9 +290,13 @@ sequences - number of processed reads.
 
 #### Library assessment
 **Id:** discordant_read_pairs
+ 
 **Description:** The percentage of properly paired reads after alignment
+ 
 **Source:** samtools v1.13 (reads_properly_paired_percent)
+ 
 **Implementation details:**
+ 
 As used for average coverage
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 
@@ -270,9 +313,13 @@ reads_properly_paired_percent
 
 #### Insert size assessment
 **Id:** mean_insert_size
+ 
 **Description:** A tuple of mean insert size for paired and mapped reads followed by the insert size standard deviation for the average template length distribution
+ 
 **Source:** samtools v1.13 (Insert_size_average and insert_size_standard_deviation)
+ 
 **Implementation details:**
+ 
 As used for average coverage
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 
