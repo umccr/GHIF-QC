@@ -1,12 +1,13 @@
 # GHIF-QC
 Outline of tools used to generate a set of key QC metrics for standardised reporting of sequencing data, initially focused on germline WGS QC for short-read squencers.
+
 [Trello Card](https://trello.com/c/pRI1C3l2)
 
 Driven by Practical guidelines for quality control of WGS results in population-scale initiatives
 
 Initial scope:
 
-  * Identify GiaB BAM ( @romanvalls - we have a public one somewhere for htsget?)
+  * Identify GiaB BAM 
   * Re-create key bcbio QC metric steps in Nextflow
   * Apply to BAM
   * Generate QC metrics in JSON format (directly or through MultiQC processing)
