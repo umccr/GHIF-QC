@@ -26,15 +26,33 @@ In terms of scope, the workgroup has agreed to focus on germline WGS QC first. W
 
 ##Discussion points for GHIF meeting 26/10/21
 
-  * Some of the suggested "field" metrics such as base quality are difficult to filter or change at the BAM stage (without creating a entirely new BAM file)
+  * Some of the required "field" metrics such as base quality are difficult to filter or change at the BAM stage (without creating a entirely new BAM file)
   These include:
     * removal of low quality bases ie BQ >= 30,
     * collapsing of UMIs
     * marking of duplicates
     * how unmapped reads have been handled, and whether they are still included with the bam file
 
-    These may affect some of the calculated QC metrics if the relevant information if not provided as metadata along with the Bam files. How to assess QC metrics if they are unknown?
-    ie if unmapped reads are not included in BAM file, is "Contamination" QC metric assessable?
+    ##Discussion points for GHIF meeting 26/10/21
+
+      * Some of the required "field" metrics such as base quality are difficult to filter or change at the BAM stage (without creating a entirely new BAM file)
+      These include:
+        * removal of low quality bases ie BQ >= 30,
+        * collapsing of UMIs
+        * marking of duplicates
+        * how unmapped reads have been handled, and whether they are still included with the bam file
+
+        These may affect some of the calculated QC metrics if the relevant information if not provided as metadata along with the Bam files. How to assess QC metrics if they are unknown?
+        ie if unmapped reads are not included in BAM file, is "Contamination" QC metric assessable?
+
+
+
+      * Common programs for dealing with BAM files seem to allow filtering bases on mapping quality but not base quality
+        * ie BQ filter available for samtools coverage but not mosdepth nor samtools stats
+        * Is it possible to just report % of bases <= Q20?
+
+      * Some programs report a mean coverage per chromosome summary. To obtain mean coverage across all autosomes, should chromosome length be taken into account or is Sum of mean chromosome coverage / number of chromosomes sufficient?
+
 
 
 
@@ -42,7 +60,7 @@ In terms of scope, the workgroup has agreed to focus on germline WGS QC first. W
     * ie BQ filter available for samtools coverage but not mosdepth nor samtools stats
     * Is it possible to just report % of bases <= Q20?
 
-  * Some programs are reporting mean coverage per chromosome. To obtain mean coverage across all autosomes, should chromosome length be taken into account or is Sum of mean chromosome coverage / number of chromosomes sufficient?
+  * Some programs report a mean coverage per chromosome summary. To obtain mean coverage across all autosomes, should chromosome length be taken into account or is Sum of mean chromosome coverage / number of chromosomes sufficient?
 
 
 
@@ -110,6 +128,9 @@ General template
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 
 *(The reference fasta file is only required for GC-depth and mismatches-per-cycle calculation - so not really required here)*
+
+`samtools stats --remove-overlaps --remove-dups --target-regions  NA12878.bam > samtools_stats_noDups_noOlps.txt`
+
 
 To obtain Summary Numbers only
 
