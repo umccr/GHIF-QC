@@ -7,11 +7,13 @@ Driven by Practical guidelines for quality control of WGS results in population-
 
 Initial scope:
 
-  * Identify GiaB BAM 
+  * Identify GiaB BAM
   * Re-create key bcbio QC metric steps in Nextflow
   * Apply to BAM
   * Generate QC metrics in JSON format (directly or through MultiQC processing)
   * Discuss, document key metrics; submit results and workflow to [wgs-sample-qc/proof-of-concept at main · c-BIG/wgs-sample-qc](https://github.com/c-BIG/wgs-sample-qc/tree/main/proof-of-concept)
+
+
 
 ## GHIF Practical guidelines for quality control of WGS results in population-scale initiatives
 
@@ -21,6 +23,28 @@ Initial scope:
 >General notes
 The document is just a first draft to capture conversations from our regular meetings. It provides some templated sections as a guide, but those may not be exhaustive. As such, feel free to make as many changes as needed; we can always recover previous versions of the document using the file history.
 In terms of scope, the workgroup has agreed to focus on germline WGS QC first. While all of the workgroup participants are working with short-read data at the moment, we wish to make the definitions general enough to be applicable to other technologies as well. The workgroup also acknowledges that there are multiple stages in the analysis pipeline at which one may want to perform QC (e.g. post-FASTQ generation, post-alignment, post-variant calling). For the first iteration of the guidelines, the workgroup has agreed to focus on metrics that can be obtained from a BAM/CRAM file. Thus, metrics such as contamination or variant counts remain out of scope at the moment.
+
+##Discussion points for GHIF meeting 26/10/21
+
+  * Some of the suggested "field" metrics such as base quality are difficult to filter or change at the BAM stage (without creating a entirely new BAM file)
+  These include:
+    * removal of low quality bases ie BQ >= 30,
+    * collapsing of UMIs
+    * marking of duplicates
+    * how unmapped reads have been handled, and whether they are still included with the bam file
+
+    These may affect some of the calculated QC metrics if the relevant information if not provided as metadata along with the Bam files. How to assess QC metrics if they are unknown?
+    ie if unmapped reads are not included in BAM file, is "Contamination" QC metric assessable?
+
+
+
+  * Common programs for dealing with BAM files seem to allow filtering bases on mapping quality but not base quality
+    * ie BQ filter available for samtools coverage but not mosdepth nor samtools stats
+    * Is it possible to just report % of bases <= Q20?
+
+  * Some programs are reporting mean coverage per chromosome. To obtain mean coverage across all autosomes, should chromosome length be taken into account or is Sum of mean chromosome coverage / number of chromosomes sufficient?
+
+
 
 ### Documents
 [GHIF repo](https://github.com/c-BIG/wgs-sample-qc)
@@ -57,6 +81,8 @@ File locations on Gadi:
 /g/data/gx8/projects/Mitchell_GHIFqc
 
 *Note Gadi has different versions of mosdepth and samtools*
+
+
 
 ### Metric definitions
 General template
@@ -202,19 +228,19 @@ Other options
 
 
 ##### Average coverage excluding low mapping regions
- 
+
 **Id:** mean_high_confidence_region_coverage
- 
+
 **Description:** The mean coverage in all autosomes excluding all difficult to map regions and all segmental duplications.
- 
+
 **Source:** mosdepth v0.3.2
- 
+
 **Implementation details:**
- 
+
 `mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1 NA12878_nialmsdr NA12878.bam`
- 
+
 *Investigate using [datamash](https://www.gnu.org/software/datamash/) for extracting metrics from NA12878_nialmsdr.mosdepth.summary.txt*
- 
+
 *Manual calculation for mean_autosome_coverage from mosdepth summary file = 31.63*
 
 
@@ -222,20 +248,20 @@ Other options
 #### Genome completeness (example implementation: Percent autosomes covered ≥ 15 X)
 
  **Id:** pct_high_confidence_regions_20x
- 
+
 **Description:** The percentage of bases that attained at least 20X sequence coverage in all autosomes excluding all difficult to map regions and all segmental duplications.
- 
+
 **Source:** mosdepth v0.3.2
- 
+
 **Implementation details:
- 
+
 ```
 #Run mosdepth - as used for mean_high_confidence_region_coverage
- 
+
 mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1 NA12878_nialmsdr NA12878.bam
- 
+
 #Extract mean estimate from region distribution file
- 
+
 grep -h "\btotal	20\b" NA12878_nialmsdr.mosdepth.region.dist.txt | cut -f3
 ```
 >0.98
@@ -243,26 +269,26 @@ grep -h "\btotal	20\b" NA12878_nialmsdr.mosdepth.region.dist.txt | cut -f3
 98 %
 
 From [Mosdepth readme](https://github.com/brentp/mosdepth)
- 
+
 >The $prefix.mosdepth.global.dist.txt file contains, a cumulative distribution indicating the proportion of total bases (or the proportion of the --by for $prefix.mosdepth.region.dist.txt) that were covered for at least a given coverage value. It does this for each chromosome, and for the whole genome.
 
 So the global percent covered >= 20X is also available
- 
+
 `grep -h "\btotal	20\b" NA12878_nialmsdr.mosdepth.global.dist.txt | cut -f3`
 >0.89
 
 
 #### Genome coverage uniformity
- 
+
 **Id:** high_confidence_regions_coverage_uniformity
- 
+
 **Description:** The percentage of bases with more or less than 25% coverage difference from the mean autosome coverage
- 
+
 **Source:** in-house tool based on mosdepth v0.3.2 calculating (PCT < 0.75 * mean_autosome_coverage) + (PCT > 1.25 * mean_autosome_coverage)
- 
+
 **Implementation details:** same as mean_autosome_coverage.
- 
- 
+
+
 ```
 #Run mosdepth - as used for high_confidence_region_coverage
 mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1 NA12878_nialmsdr NA12878.bam`
@@ -282,39 +308,39 @@ grep -h "\btotal	40\b" NA12878_nialmsdr.mosdepth.region.dist.txt | cut -f3
 
 
 #### Contamination estimate
- 
+
 **Id:** read_mapping_quality
- 
+
 **Description:** The percentage of reads mappable to the REF sequence with MAPQ>0
- 
+
 **Source:** samtools v1.13 (reads_mapped_percent)
- 
+
 **Implementation details
 
 As used for average coverage
- 
+
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 
 To obtain Summary Numbers only - optional
- 
+
 `grep ^SN samtools_stats_noDups_NoOlps.txt | cut -f 2- >summaryNumbers.txt`
 
 Mapped Reads
- 
+
 `grep -h "SN	reads mapped:" samtools_stats_noDups_NoOlps.txt | cut -f3 `
- 
+
 >676950739
 
 Reads MAPQ = 0
- 
+
 `grep -h "SN	reads MQ0:" samtools_stats_noDups_NoOlps.txt | cut -f3 `
- 
+
 >38854425
 
 Total reads
- 
+
 `grep -h "SN	raw total sequences:" samtools_stats_noDups_NoOlps.txt | cut -f3 `
- 
+
 >758135204
 
 read_mapping_quality [(Mapped Reads - Reads MQ0) / Total reads]
@@ -323,7 +349,7 @@ read_mapping_quality [(Mapped Reads - Reads MQ0) / Total reads]
 84 %
 
 Details from samtools stats
- 
+
 raw total sequences - total number of reads in a file, excluding supplementary and secondary reads. Same number reported by samtools view -c.
 
 filtered sequences - number of discarded reads when using -f or -F option.
@@ -332,27 +358,27 @@ sequences - number of processed reads.
 
 
 #### Library assessment
- 
+
 **Id:** discordant_read_pairs
- 
+
 **Description:** The percentage of properly paired reads after alignment
- 
+
 **Source:** samtools v1.13 (reads_properly_paired_percent)
- 
+
 **Implementation details:**
- 
+
 As used for average coverage
- 
+
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 
 To obtain Summary Numbers only - optional
- 
+
 `grep ^SN samtools_stats_noDups_NoOlps.txt | cut -f 2- >summaryNumbers.txt`
 
 reads_properly_paired_percent
- 
+
 `grep -h "SN	percentage of properly paired reads (%):" samtools_stats_noDups_NoOlps.txt | cut -f3 `
- 
+
 >98.0
 
 98 %
@@ -360,37 +386,37 @@ reads_properly_paired_percent
 
 
 #### Insert size assessment
- 
+
 **Id:** mean_insert_size
- 
+
 **Description:** A tuple of mean insert size for paired and mapped reads followed by the insert size standard deviation for the average template length distribution
- 
+
 **Source:** samtools v1.13 (Insert_size_average and insert_size_standard_deviation)
- 
+
 **Implementation details:**
- 
+
 As used for average coverage
- 
+
 `samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa NA12878.bam > samtools_stats_noDups_noOlps.txt`
 
 To obtain Summary Numbers only - optional
- 
+
 `grep ^SN samtools_stats_noDups_NoOlps.txt | cut -f 2- >summaryNumbers.txt`
 
 Insert_size_average
- 
+
 `grep -h "SN	insert size average:" samtools_stats_noDups_NoOlps.txt | cut -f3 `
- 
+
 >440.2
 
 Insert_size_SD
- 
+
 `grep -h "SN	insert size standard deviation:" samtools_stats_noDups_NoOlps.txt | cut -f3 `
- 
+
 >98.9
 
 samtools stats details
- 
+
   *insert size average - the average absolute template length for paired and mapped reads.
 
   *insert size standard deviation - standard deviation for the average template length distribution.
