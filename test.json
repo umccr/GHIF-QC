@@ -1,0 +1,59 @@
+cat NA12878.coverage_metrics.json
+# {
+#     "sample_id": "NA12878",
+#     "qc_metrics": {
+#         "source": "In-house tool based on samtools stats 1.13",
+#         "implementation_details": {
+#             "REF": "GRCh38 (## refget checksum ##) hg38_alt_aware_nohla.fa",
+#             "TARGET_REGIONS": "Targets_Homo_sapiens_assembly38_autosomes.txt",
+#             "MIN_BQ": 0,
+#             "MIN_MQ": 0,
+#             "DUP": false,
+#             "CLP": false,
+#             "UMI": false,
+#             "OLP": false
+#         },
+#
+#         ...
+#
+#         "mean_base_quality": {
+#             "description": " are applied.",
+#             "value": 29.5
+#         },
+#
+#         ...
+#
+#         "yield_mapped_bp": {
+#             "description": "Number of mapped bases filtered by the CIGAR string corresponding to the read they belong to. Only alignment matches(M), inserts(I), sequence matches(=) and sequence mismatches(X) are counted.",
+#             "value": 92677929585
+#         },
+#
+#         ...
+#
+#         "pct_autosomes_20x": {
+#             "description": "The percentage of bases that attained at least 20X sequence coverage in autosomes.",
+#             "value": 92.31
+#         },
+#
+#         ...
+#
+#         "pct_mapped_reads": {
+#             "description": "The percentage of reads mappable to the REF sequence with MAPQ>0.",
+#             "value": 84
+#         },
+#
+#         ...
+#
+#         "pct_discordant_read_pairs": {
+#             "description": "The percentage of improperly paired reads after alignment.",
+#             "value": 1.7
+#         },
+#
+#         ...
+#
+#         "mean_insert_size": {
+#             "description": "A tuple of mean insert size for paired and mapped reads followed by the insert size standard deviation for the average template length distribution.",
+#             "value": 440, 99
+#         }
+#     }
+# }

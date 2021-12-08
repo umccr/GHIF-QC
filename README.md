@@ -129,7 +129,7 @@ General template
 
 *(The reference fasta file is only required for GC-depth and mismatches-per-cycle calculation - so not really required here)*
 
-`samtools stats --remove-overlaps --remove-dups --target-regions  NA12878.bam > samtools_stats_noDups_noOlps.txt`
+`samtools stats --remove-overlaps --remove-dups --target-regions Targets_Homo_sapiens_assembly38_autosomes.txt NA12878.bam > samtools_stats_noDups_noOlps_autosomesOnly.txt`
 
 
 To obtain Summary Numbers only

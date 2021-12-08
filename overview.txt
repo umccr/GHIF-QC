@@ -1,0 +1,124 @@
+Capture of QC metrics - needs to be output as json - see example https://github.com/c-BIG/wgs-sample-qc/tree/main/example_implementations/sg-npm
+
+Current plan is to have two seperate workflows
+
+A) samtools stats to generate
+yield_mapped_bp
+pct_autosomes_20x
+pct_mapped_reads
+pct_discordant_read_pairs
+mean_insert_size
+%GC maxima (and minima? - still working on this one!)
+
+
+B) mosdepth to generate
+mean_autosome_coverage
+pct_autosomes_20x (compare to samtools estimate!)
+autosome_coverage_uniformity
+
+
+Workflow A
+
+
+
+Reference files (will transfer to GDS)
+Genome assembly used:
+"hg38_alt_aware_nohla.fa"
+
+Targets file to limit to autosomes only
+"Targets_Homo_sapiens_assembly38_autosomes.txt"
+
+Example GIAB germline bam file (will transfer to GDS)
+"NA12878.bam"
+
+
+samtools 1.13
+Using htslib 1.13
+```bash
+samtools stats --remove-overlaps --remove-dups --ref-seq hg38_alt_aware_nohla.fa --target-regions Targets_Homo_sapiens_assembly38_autosomes.txt --cov-threshold 20 NA12878.bam > samtools_stats.txt
+```
+
+
+
+Not able to filter on Base Quality with Samtools Stats, so instead average base quality can be reported in metadata. Average base quality can be obtained from Summary Numbers "average quality"
+
+```bash
+grep -h "SN	average quality" samtools_stats.txt | cut -f 3
+```
+>29.5
+
+
+
+###METRIC yield_mapped_bp
+
+```bash
+grep -h "SN	bases mapped (cigar)" samtools_stats.txt | cut -f 3
+```
+>92677929585
+
+
+
+
+###METRIC pct_autosomes_20x
+
+```bash
+grep -h "SN	percentage of target genome with coverage > 20" samtools_stats.txt | cut -f 3
+```
+>92.31
+
+
+
+###METRIC pct_mapped_reads
+
+pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]
+
+RM = Mapped Reads
+R0 = Reads MQ0
+RT = Total Reads
+
+```bash
+RM=$(grep -h "SN reads mapped:" samtools_stats.txt | cut -f3)
+R0=$(grep -h "SN	reads MQ0:" samtools_stats.txt | cut -f3)
+RT=$(grep -h "SN	raw total sequences:" samtools_stats.txt | cut -f3)
+echo "$(( 100 * ( $RM - $R0) / $RT ))"
+```
+>84
+
+
+
+
+
+###METRIC pct_discordant_read_pairs
+
+100 - reads properly paired
+
+```bash
+PPR=$(grep -h "SN	percentage of properly paired reads (%):" samtools_stats.txt | cut -f3)
+awk -vn1="$PPR" 'BEGIN { print (100 - n1) }'
+```
+>1.7
+
+
+
+
+
+###METRIC mean_insert_size
+
+**Description:** A tuple of mean insert size for paired and mapped reads followed by the insert size standard deviation for the average template length distribution
+
+Insert_size_average (assuming "average" = mean)
+
+```bash
+grep -h "SN	insert size average:" samtools_stats.txt | cut -f3
+```
+>440.4
+
+Insert_size_SD
+
+```bash
+grep -h "SN	insert size standard deviation:" samtools_stats.txt | cut -f3
+```
+>98.9
+
+
+So based on sg-npm test.json is an example output. Since we are using the same implementation for everything we are adding as many details as possible to global metadata rather than individual metrics
