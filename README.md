@@ -27,14 +27,16 @@ Initial scope:
   - [Yield](#yield)
   - [Average coverage (example implementation: Mean autosome coverage)](#average-coverage-example-implementation-mean-autosome-coverage)
   - [Alternative method using mosdepth](#alternative-method-using-mosdepth)
+    - [Notes:](#notes)
     - [Mosdepth details](#mosdepth-details)
   - [Average coverage excluding low mapping regions](#average-coverage-excluding-low-mapping-regions)
   - [Genome completeness (example implementation: Percent autosomes covered ≥ 15 X)](#genome-completeness-example-implementation-percent-autosomes-covered--15-x)
   - [Genome coverage uniformity](#genome-coverage-uniformity)
   - [Contamination estimate](#contamination-estimate)
+    - [samtools stats details](#samtools-stats-details)
   - [Library assessment](#library-assessment)
   - [Insert size assessment](#insert-size-assessment)
-    - [samtools stats details](#samtools-stats-details)
+    - [samtools stats details](#samtools-stats-details-1)
 
 <!-- vim-markdown-toc -->
 
@@ -101,6 +103,7 @@ Need to check if this really is limited to autosomes! - It does not appear to be
 *Note*: Gadi has different versions of mosdepth and samtools*
 
 ## Metric definitions
+THis section defines the key criteria and metrics that are currently being explored.
 
 ### General template:
 
@@ -152,13 +155,10 @@ Average base quality can be obtained from Summary Numbers "average quality"
 Average quality:	29.5
 ```
 
-Precise definitions from [samtools-stats](http://www.htslib.org/doc/samtools-stats.html)
-
-reads mapped - number of reads, paired or single, that are mapped (flag 0x4 [read unmapped] or 0x8 [mate unmapped] not set).
-
-bases mapped - number of processed bases that belong to reads mapped #ignores clipping
-
-bases mapped (cigar) - number of mapped bases filtered by the CIGAR string corresponding to the read they belong to. Only alignment matches(M), inserts(I), sequence matches(=) and sequence mismatches(X) are counted. # more accurate
+* Precise definitions from [samtools-stats](http://www.htslib.org/doc/samtools-stats.html)
+* reads mapped - number of reads, paired or single, that are mapped (flag 0x4 [read unmapped] or 0x8 [mate unmapped] not set).
+* bases mapped - number of processed bases that belong to reads mapped #ignores clipping
+* bases mapped (cigar) - number of mapped bases filtered by the CIGAR string corresponding to the read they belong to. Only alignment matches(M), inserts(I), sequence matches(=) and sequence mismatches(X) are counted. # more accurate
 
 
 | Field   | Description | Format | Value in example implementation |
@@ -169,9 +169,7 @@ bases mapped (cigar) - number of mapped bases filtered by the CIGAR string corre
 | UMI | Are Unique Molecular Identifiers used to collapse reads? | Boolean | FALSE |
 | OLP | Are paired-end read overlaps included in counts? | Boolean | FALSE |
 
-*Samtools stats also allows a -t, --target-regions FILE to be specified. Do stats in these regions only. Tab-delimited file chr,from,to, 1-based, inclusive.*
-
-*And percentage of target genome with coverage > VAL - percentage of target bases with a coverage larger than VAL. By default, VAL is 0, but a custom value can be supplied by the user with -g option.*
+Samtools stats also allows a -t, --target-regions FILE to be specified. Do stats in these regions only. Tab-delimited file chr,from,to, 1-based, inclusive. Additionally, percentage of target genome with coverage > VAL - percentage of target bases with a coverage larger than VAL. By default, VAL is 0, but a custom value can be supplied by the user with -g option.*
 
 
 ### Average coverage (example implementation: Mean autosome coverage)
@@ -237,10 +235,11 @@ NA12878_all.mosdepth.summary.txt contains a summary of mean depths per chromosom
 
 Mean for all autosomes can be calculated in a similar fashion to samtools mean_autosome_coverage
 
-*Investigate using [datamash](https://www.gnu.org/software/datamash/) for extracting metrics from NA12878_all.mosdepth.summary.txt*
-*Manual calculation for mean_autosome_coverage from mosdepth summary file = 30.0495*
+#### Notes: 
 
-Note: *.mosdepth.summary.txt as output was only added in v0.2.6
+* Investigate using [datamash](https://www.gnu.org/software/datamash/) for extracting metrics from NA12878_all.mosdepth.summary.txt
+* Manual calculation for mean_autosome_coverage from mosdepth summary file = 30.0495
+* .mosdepth.summary.txt as output was only added in v0.2.6
 
 #### Mosdepth details
 
@@ -295,13 +294,12 @@ $ mosdepth --no-per-base --by GRCh38_notinalllowmapandsegdupregions.bed --mapq 1
 $ grep -h "\btotal	20\b" NA12878_nialmsdr.mosdepth.region.dist.txt | cut -f3
 
 > 0.98
-```
-
 98 %
+```
 
 From [Mosdepth readme](https://github.com/brentp/mosdepth)
 
->The $prefix.mosdepth.global.dist.txt file contains, a cumulative distribution indicating the proportion of total bases (or the proportion of the --by for $prefix.mosdepth.region.dist.txt) that were covered for at least a given coverage value. It does this for each chromosome, and for the whole genome.
+> The $prefix.mosdepth.global.dist.txt file contains, a cumulative distribution indicating the proportion of total bases (or the proportion of the --by for $prefix.mosdepth.region.dist.txt) that were covered for at least a given coverage value. It does this for each chromosome, and for the whole genome.
 
 So the global percent covered >= 20X is also available:
 
@@ -378,13 +376,11 @@ read_mapping_quality [(Mapped Reads - Reads MQ0) / Total reads]
 84 %
 ```
 
-Details from samtools stats
+#### samtools stats details
 
-raw total sequences - total number of reads in a file, excluding supplementary and secondary reads. Same number reported by samtools view -c.
-
-filtered sequences - number of discarded reads when using -f or -F option.
-
-sequences - number of processed reads.
+* raw total sequences - total number of reads in a file, excluding supplementary and secondary reads. Same number reported by samtools view -c.
+* filtered sequences - number of discarded reads when using -f or -F option.
+* sequences - number of processed reads.
 
 ### Library assessment
 
@@ -449,5 +445,4 @@ $ grep -h "SN	insert size standard deviation:" samtools_stats_noDups_NoOlps.txt 
 #### samtools stats details
 
 * insert size average - the average absolute template length for paired and mapped reads.
-
 * insert size standard deviation - standard deviation for the average template length distribution.
