@@ -1,0 +1,54 @@
+[
+  {
+    "sampleID": "NA12878"
+  },
+  {
+    "average_base_quality": {
+      "description": "average base quality",
+      "source": "SN\taverage quality",
+      "value": "29.5"
+    }
+  },
+  {
+    "yield_mapped_bp": {
+      "description": "yield mapped bp",
+      "source": "SN\tbases mapped (cigar)",
+      "value": "92677929585"
+    }
+  },
+  {
+    "pct_autosomes_20x": {
+      "description": "pct autosomes 20x",
+      "source": "SN\tpercentage of target genome with coverage > 20",
+      "value": "92.31"
+    }
+  },
+  {
+    "pct_discordant_reads": {
+      "description": "pct discordant reads",
+      "source": "SN\tpercentage of properly paired reads (%)",
+      "value": "98.3"
+    }
+  },
+  {
+    "mean_insert_size": {
+      "description": "mean insert size",
+      "source": "SN\tinsert size average",
+      "value": "440.4"
+    }
+  },
+  {
+    "insert_size_sd": {
+      "description": "insert size sd",
+      "source": "SN\tinsert size standard deviation",
+      "value": "98.3"
+    }
+  },
+  {
+    "pct_mapped_reads": {
+      "description": "pct mapped reads",
+      "source": "pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]",
+      "value": "84"
+    }
+  }
+]
