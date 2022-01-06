@@ -38,12 +38,12 @@ JSON_STRING=$( jq -n \
 echo $JSON_STRING >> $output
 
 # Extract pct_discordant_read_pairs
-pct_discordant_reads=$(grep -h "SN	percentage of properly paired reads (%):" $input | cut -f3)
-pdr=$(awk -vn1="$pct_discordant_reads" 'BEGIN { print (100 - n1) }')
+pct_properly_paired_reads=$(grep -h "SN	percentage of properly paired reads (%):" $input | cut -f3)
+pdr=$(awk -vn1="$pct_properly_paired_reads" 'BEGIN { print (100 - n1) }')
 JSON_STRING=$( jq -n \
-                  --arg des "pct discordant reads" \
+                  --arg des "pct properly paired reads" \
                   --arg src "SN	percentage of properly paired reads (%)" \
-                  --arg val "$pct_discordant_reads" \
+                  --arg val "$pct_properly_paired_reads" \
                   '{pct_discordant_reads: {description: $des, source: $src, value: $val}}' )
 echo $JSON_STRING >> $output
 
