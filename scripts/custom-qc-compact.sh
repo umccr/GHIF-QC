@@ -71,7 +71,5 @@ JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   --arg val "$pct_mapped_reads" \
                   '{pct_mapped_reads: {description: $des, source: $src, value: $val}}' )"
 
-echo "$JSON_STRING" > int.txt
-
 # Write output to file
 echo $JSON_STRING | jq '[inputs] | add' > $output
