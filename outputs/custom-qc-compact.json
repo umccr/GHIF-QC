@@ -25,9 +25,9 @@
     "value": "98.3"
   },
   "pct_discordant_reads": {
-    "description": "pct properly paired reads",
-    "source": "SN\tpercentage of properly paired reads (%)",
-    "value": "98.3"
+    "description": "pct discordant paired reads",
+    "source": "100 - percentage of properly paired reads (%)",
+    "value": "1.7"
   },
   "pct_mapped_reads": {
     "description": "pct mapped reads",

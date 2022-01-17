@@ -52,9 +52,9 @@ JSON_STRING="${JSON_STRING}"$'\n'"$(get_json_str_from_stats_file "insert size st
 pct_properly_paired_reads=$(grep -h "SN	percentage of properly paired reads (%):" $input | cut -f3)
 pdr=$(awk -vn1="$pct_properly_paired_reads" 'BEGIN { print (100 - n1) }')
 JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
-                  --arg des "pct properly paired reads" \
-                  --arg src "SN	percentage of properly paired reads (%)" \
-                  --arg val "$pct_properly_paired_reads" \
+                  --arg des "pct discordant paired reads" \
+                  --arg src "100 - percentage of properly paired reads (%)" \
+                  --arg val "$pdr" \
                   '{pct_discordant_reads: {description: $des, source: $src, value: $val}}' )"
 
 # Extract pct_mapped_reads where pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]
