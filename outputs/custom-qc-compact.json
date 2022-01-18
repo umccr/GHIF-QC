@@ -9,49 +9,119 @@
   {
     "average_base_quality": {
       "description": "average base quality",
-      "source": "average quality",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "29.5"
     }
   },
   {
     "yield_mapped_bp": {
       "description": "yield mapped bp",
-      "source": "bases mapped (cigar)",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "92677929585\n4.137064e-03"
     }
   },
   {
     "pct_autosomes_20x": {
       "description": "pct autosomes 20x",
-      "source": "percentage of target genome with coverage > 20",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "92.31"
     }
   },
   {
     "mean_insert_size": {
       "description": "mean insert size",
-      "source": "insert size average:",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "440.4"
     }
   },
   {
     "insert_size_sd": {
       "description": "insert size sd",
-      "source": "insert size standard deviation:",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "98.3"
     }
   },
   {
     "pct_discordant_reads": {
       "description": "pct discordant paired reads",
-      "source": "100 - percentage of properly paired reads (%)",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "1.7"
     }
   },
   {
     "pct_mapped_reads": {
       "description": "pct mapped reads",
-      "source": "pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]",
+      "source": "samtools:1.13--h8c37831_0",
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 20,
+          "DUP": "false",
+          "SEC": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "84"
     }
   }

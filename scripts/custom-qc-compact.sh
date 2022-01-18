@@ -15,12 +15,14 @@ get_json_str_from_stats_file(){
     # Get value from file and then parse through jq
     value="$(grep "${pattern}" "${stats_file}" | cut -f2)"
     # Return json string
+    # https://unix.stackexchange.com/questions/676634/creating-a-nested-json-file-from-variables-using-jq
     jq -n \
         --arg des "$description" \
-        --arg src "$pattern" \
+        --arg src "samtools:1.13--h8c37831_0" \
         --arg val "$value" \
         --arg key_name "$key" \
-        '{($key_name): {description: $des, source: $src, value: $val}}'
+        --argjson detail "[{\"MIN_BQ\": 0, \"MIN_MQ\": 20, \"DUP\": \"false\", \"SEC\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}]" \
+        '{($key_name): {description: $des, source: $src, implementation_details: $detail, value: $val}}'
 }
 # Extract Summary Number section from stats file
 samtools_stats_file="summary_numbers.txt" 
@@ -54,9 +56,10 @@ pct_properly_paired_reads=$(grep -h "SN	percentage of properly paired reads (%):
 pdr=$(awk -vn1="$pct_properly_paired_reads" 'BEGIN { print (100 - n1) }')
 JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   --arg des "pct discordant paired reads" \
-                  --arg src "100 - percentage of properly paired reads (%)" \
+                  --arg src "samtools:1.13--h8c37831_0" \
                   --arg val "$pdr" \
-                  '{pct_discordant_reads: {description: $des, source: $src, value: $val}}' )"
+                  --argjson detail "[{\"MIN_BQ\": 0, \"MIN_MQ\": 20, \"DUP\": \"false\", \"SEC\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}]" \
+                  '{pct_discordant_reads: {description: $des, source: $src, implementation_details: $detail, value: $val}}' )"
 
 # Extract pct_mapped_reads where pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]
 # RM = Mapped Reads
@@ -68,9 +71,10 @@ RT=$(grep -h "SN	raw total sequences:" $input | cut -f3)
 pct_mapped_reads=$(( 100 * ( $RM - $R0) / $RT ))
 JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   --arg des "pct mapped reads" \
-                  --arg src "pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]" \
+                  --arg src "samtools:1.13--h8c37831_0" \
                   --arg val "$pct_mapped_reads" \
-                  '{pct_mapped_reads: {description: $des, source: $src, value: $val}}' )"
+                  --argjson detail "[{\"MIN_BQ\": 0, \"MIN_MQ\": 20, \"DUP\": \"false\", \"SEC\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}]" \
+                  '{pct_mapped_reads: {description: $des, source: $src, implementation_details: $detail, value: $val}}' )"
 
 # Write output to file
 echo $JSON_STRING | jq -n '. |= [inputs]' > $output
