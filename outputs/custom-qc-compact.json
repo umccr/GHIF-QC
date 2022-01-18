@@ -1,37 +1,58 @@
-{
-  "average_base_quality": {
-    "description": "average base quality",
-    "source": "average quality",
-    "value": "29.5"
+[
+  {
+    "input": {
+      "description": "sample id",
+      "source": "GIAB",
+      "value": "NA12878"
+    }
   },
-  "yield_mapped_bp": {
-    "description": "yield mapped bp",
-    "source": "bases mapped (cigar)",
-    "value": "92677929585\n4.137064e-03"
+  {
+    "average_base_quality": {
+      "description": "average base quality",
+      "source": "average quality",
+      "value": "29.5"
+    }
   },
-  "pct_autosomes_20x": {
-    "description": "pct autosomes 20x",
-    "source": "percentage of target genome with coverage > 20",
-    "value": "92.31"
+  {
+    "yield_mapped_bp": {
+      "description": "yield mapped bp",
+      "source": "bases mapped (cigar)",
+      "value": "92677929585\n4.137064e-03"
+    }
   },
-  "mean_insert_size": {
-    "description": "mean insert size",
-    "source": "insert size average:",
-    "value": "440.4"
+  {
+    "pct_autosomes_20x": {
+      "description": "pct autosomes 20x",
+      "source": "percentage of target genome with coverage > 20",
+      "value": "92.31"
+    }
   },
-  "insert_size_sd": {
-    "description": "insert size sd",
-    "source": "insert size standard deviation:",
-    "value": "98.3"
+  {
+    "mean_insert_size": {
+      "description": "mean insert size",
+      "source": "insert size average:",
+      "value": "440.4"
+    }
   },
-  "pct_discordant_reads": {
-    "description": "pct discordant paired reads",
-    "source": "100 - percentage of properly paired reads (%)",
-    "value": "1.7"
+  {
+    "insert_size_sd": {
+      "description": "insert size sd",
+      "source": "insert size standard deviation:",
+      "value": "98.3"
+    }
   },
-  "pct_mapped_reads": {
-    "description": "pct mapped reads",
-    "source": "pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]",
-    "value": "84"
+  {
+    "pct_discordant_reads": {
+      "description": "pct discordant paired reads",
+      "source": "100 - percentage of properly paired reads (%)",
+      "value": "1.7"
+    }
+  },
+  {
+    "pct_mapped_reads": {
+      "description": "pct mapped reads",
+      "source": "pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]",
+      "value": "84"
+    }
   }
-}
+]

@@ -28,11 +28,12 @@ grep ^SN $1 | cut -f 2- > "${samtools_stats_file}"
 
 # Sample metadata
 JSON_STRING=$( jq -n \
-                  --arg sm "NA12878" \
-                  '{sampleID: $sm}' )
-#echo $JSON_STRING >> $output
+                  --arg des "sample id" \
+                  --arg src "GIAB" \
+                  --arg val "NA12878" \
+                  '{input: {description: $des, source: $src, value: $val}}' )
 
-# embedded new line in a variable in bash
+# embedded new line in a variable in bash https://stackoverflow.com/questions/9139401/trying-to-embed-newline-in-a-variable-in-bash
 # Extract average base quality
 JSON_STRING="${JSON_STRING}"$'\n'"$(get_json_str_from_stats_file "average quality" "${samtools_stats_file}" "average_base_quality" "average base quality")"
 
@@ -72,4 +73,4 @@ JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   '{pct_mapped_reads: {description: $des, source: $src, value: $val}}' )"
 
 # Write output to file
-echo $JSON_STRING | jq '[inputs] | add' > $output
+echo $JSON_STRING | jq -n '. |= [inputs]' > $output
