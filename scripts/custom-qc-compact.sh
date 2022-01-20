@@ -21,7 +21,7 @@ get_json_str_from_stats_file(){
         --arg src "samtools:1.13--h8c37831_0" \
         --arg val "$value" \
         --arg key_name "$key" \
-        --argjson detail "[{\"MIN_BQ\": 0, \"MIN_MQ\": 20, \"DUP\": \"false\", \"SEC\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}]" \
+        --argjson detail "{\"MIN_BQ\": 0, \"MIN_MQ\": 0, \"DUP\": \"false\", \"SEC\": \"false\", \"SUP\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}" \
         '{($key_name): {description: $des, source: $src, implementation_details: $detail, value: $val}}'
 }
 # Extract Summary Number section from stats file
@@ -52,28 +52,28 @@ JSON_STRING="${JSON_STRING}"$'\n'"$(get_json_str_from_stats_file "insert size av
 JSON_STRING="${JSON_STRING}"$'\n'"$(get_json_str_from_stats_file "insert size standard deviation:" "${samtools_stats_file}" "insert_size_sd" "insert size sd")"
 
 # Extract pct_discordant_read_pairs
-pct_properly_paired_reads=$(grep -h "SN	percentage of properly paired reads (%):" $input | cut -f3)
+pct_properly_paired_reads=$(grep -h "percentage of properly paired reads (%):" $samtools_stats_file| cut -f3)
 pdr=$(awk -vn1="$pct_properly_paired_reads" 'BEGIN { print (100 - n1) }')
 JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   --arg des "pct discordant paired reads" \
                   --arg src "samtools:1.13--h8c37831_0" \
                   --arg val "$pdr" \
-                  --argjson detail "[{\"MIN_BQ\": 0, \"MIN_MQ\": 20, \"DUP\": \"false\", \"SEC\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}]" \
+                  --argjson detail "{\"MIN_BQ\": 0, \"MIN_MQ\": 0, \"DUP\": \"false\", \"SEC\": \"false\", \"SUP\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}" \
                   '{pct_discordant_reads: {description: $des, source: $src, implementation_details: $detail, value: $val}}' )"
 
 # Extract pct_mapped_reads where pct_mapped_reads = [(Mapped Reads - Reads MQ0) / Total Reads]
 # RM = Mapped Reads
 # R0 = Reads MQ0
 # RT = Total Reads
-RM=$(grep -h "SN	reads mapped:" $input | cut -f3)
-R0=$(grep -h "SN	reads MQ0:" $input | cut -f3)
-RT=$(grep -h "SN	raw total sequences:" $input | cut -f3)
+RM=$(grep -h "reads mapped:" $samtools_stats_file | cut -f2)
+R0=$(grep -h "reads MQ0:" $samtools_stats_file | cut -f2)
+RT=$(grep -h "raw total sequences:" $samtools_stats_file | cut -f2)
 pct_mapped_reads=$(( 100 * ( $RM - $R0) / $RT ))
 JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   --arg des "pct mapped reads" \
                   --arg src "samtools:1.13--h8c37831_0" \
                   --arg val "$pct_mapped_reads" \
-                  --argjson detail "[{\"MIN_BQ\": 0, \"MIN_MQ\": 20, \"DUP\": \"false\", \"SEC\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}]" \
+                  --argjson detail "{\"MIN_BQ\": 0, \"MIN_MQ\": 0, \"DUP\": \"false\", \"SEC\": \"false\", \"SUP\": \"false\", \"CLP\": \"false\", \"OLP\": \"false\"}" \
                   '{pct_mapped_reads: {description: $des, source: $src, implementation_details: $detail, value: $val}}' )"
 
 # Write output to file

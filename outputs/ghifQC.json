@@ -35,7 +35,7 @@
         "CLP": "false",
         "OLP": "false"
       },
-      "value": "92677929585\n4.137064e-03"
+      "value": "92589739346\n4.119846e-03"
     }
   },
   {
@@ -51,7 +51,7 @@
         "CLP": "false",
         "OLP": "false"
       },
-      "value": "92.31"
+      "value": "92.30"
     }
   },
   {
@@ -90,31 +90,35 @@
     "pct_discordant_reads": {
       "description": "pct discordant paired reads",
       "source": "samtools:1.13--h8c37831_0",
-      "implementation_details": {
-        "MIN_BQ": 0,
-        "MIN_MQ": 0,
-        "DUP": "false",
-        "SEC": "false",
-        "SUP": "false",
-        "CLP": "false",
-        "OLP": "false"
-      },
-      "value": "100"
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 0,
+          "DUP": "false",
+          "SEC": "false",
+          "SUP": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
+      "value": "1.7"
     }
   },
   {
     "pct_mapped_reads": {
       "description": "pct mapped reads",
       "source": "samtools:1.13--h8c37831_0",
-      "implementation_details": {
-        "MIN_BQ": 0,
-        "MIN_MQ": 0,
-        "DUP": "false",
-        "SEC": "false",
-        "SUP": "false",
-        "CLP": "false",
-        "OLP": "false"
-      },
+      "implementation_details": [
+        {
+          "MIN_BQ": 0,
+          "MIN_MQ": 0,
+          "DUP": "false",
+          "SEC": "false",
+          "SUP": "false",
+          "CLP": "false",
+          "OLP": "false"
+        }
+      ],
       "value": "84"
     }
   }
