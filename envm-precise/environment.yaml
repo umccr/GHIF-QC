@@ -1,0 +1,17 @@
+# usage: conda env create -p $(pwd)/miniconda/envs/precise-qc --file environment.yaml 
+# -p flag should point to your miniconda installation path.
+
+# name of the conda environment
+name: precise-qc
+
+#the paths that conda takes a look for packages. 
+#avoid using anaconda as we have experienced issues with it
+channels:
+        - bioconda
+        - conda-forge
+        - defaults
+
+#install following packages in the conda environment
+dependencies:
+        - datamash
+        - mosdepth
