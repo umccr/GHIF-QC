@@ -7,11 +7,12 @@ name: precise-qc
 #the paths that conda takes a look for packages. 
 #avoid using anaconda as we have experienced issues with it
 channels:
-        - bioconda
         - conda-forge
+        - bioconda
         - defaults
 
 #install following packages in the conda environment
 dependencies:
         - datamash
         - mosdepth
+        - bedtools
