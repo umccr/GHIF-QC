@@ -3,8 +3,9 @@
 set -xeuo pipefail
 
 # Read input
-input=$1
-output=$2
+input_samtools=$1
+input_precise=$2
+output=$3
 
 get_json_str_from_stats_file(){
     local pattern="$1"
@@ -77,4 +78,7 @@ JSON_STRING="${JSON_STRING}"$'\n'"$( jq -n \
                   '{pct_mapped_reads: {description: $des, source: $src, implementation_details: $detail, value: $val}}' )"
 
 # Write output to file
-echo $JSON_STRING | jq -n '. |= [inputs]' > $output
+echo $JSON_STRING | jq -n '. |= [inputs]' > tmp_umccr.json
+# Combine PRECISE calculate-coverage script output with UMCCR's
+cat $input_precise | jq -n '[inputs.qc_metrics]' > tmp_precise.json
+jq -s 'add' tmp_umccr.json tmp_precise.json > $output
